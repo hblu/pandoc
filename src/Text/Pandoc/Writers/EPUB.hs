@@ -176,7 +176,7 @@ writeEPUB opts doc@(Pandoc meta _) = do
             maybe [] id mbnum }
         $ case bs of
               (Header _ _ xs : _) -> Pandoc (Meta xs [] []) bs
-              _                   -> Pandoc (Meta [] [] []) bs
+              _                   -> Pandoc nullMeta bs
 
   let chapterEntries = zipWith chapToEntry [1..] chapters
 
@@ -244,7 +244,7 @@ writeEPUB opts doc@(Pandoc meta _) = do
                                 [("idref", "cover"),("linear","no")] $ () ]
               ++ ((unode "itemref" ! [("idref", "title_page")
                                      ,("linear", case meta of
-                                                      Meta [] [] [] -> "no"
+                                                      nullMeta -> "no"
                                                       _  -> "yes")] $ ()) :
                   (unode "itemref" ! [("idref", "nav")
                                      ,("linear", if writerTableOfContents opts
@@ -428,7 +428,7 @@ transformInlines (MathML _) _ _ (x@(Math _ _) : xs) = do
   -- but switch does not seem to be widely implemented yet, so we just
   -- provide the mathml
   let writeHtmlInline opts z = trimr $
-         writeHtmlString opts $ Pandoc (Meta [] [] []) [Plain [z]]
+         writeHtmlString opts $ Pandoc nullMeta [Plain [z]]
       result = writeHtmlInline def{writerHTMLMathMethod = MathML Nothing } x
   return $ RawInline "html" result : xs
 transformInlines _ _ _ xs = return xs
